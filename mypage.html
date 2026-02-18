@@ -119,13 +119,13 @@ body {
     <div class="card-title">ご利用者さま</div>
 
     <div class="name-row">
-      <div class="name-item value" id="db_sei_top">山田</div>
-      <div class="name-item value" id="db_mei_top">太郎</div>
+      <div class="name-item value" id="db_sei_top">---</div>
+      <div class="name-item value" id="db_mei_top">---</div>
     </div>
 
     <div class="name-row sub">
-      <div class="name-item" id="db_seiKana_top">ヤマダ</div>
-      <div class="name-item" id="db_meiKana_top">タロウ</div>
+      <div class="name-item" id="db_seiKana_top">---</div>
+      <div class="name-item" id="db_meiKana_top">---</div>
     </div>
   </div>
 
@@ -136,23 +136,47 @@ body {
     <div class="name-row">
       <div class="name-item">
         <div class="sub">姓</div>
-        <div class="value" id="db_sei">山田</div>
+        <div class="value" id="db_sei">---</div>
       </div>
       <div class="name-item">
         <div class="sub">名</div>
-        <div class="value" id="db_mei">太郎</div>
+        <div class="value" id="db_mei">---</div>
       </div>
     </div>
 
     <div class="name-row" style="margin-top:10px;">
       <div class="name-item">
         <div class="sub">姓（カナ）</div>
-        <div class="value" id="db_seiKana">ヤマダ</div>
+        <div class="value" id="db_seiKana">---</div>
       </div>
       <div class="name-item">
         <div class="sub">名（カナ）</div>
-        <div class="value" id="db_meiKana">タロウ</div>
+        <div class="value" id="db_meiKana">---</div>
       </div>
+    </div>
+
+    <!-- 住所 -->
+    <div style="margin-top:14px;">
+      <div class="sub">住所</div>
+      <div class="value" id="db_address">---</div>
+    </div>
+
+    <!-- 契約プラン -->
+    <div style="margin-top:14px;">
+      <div class="sub">契約プラン</div>
+      <div class="value" id="db_plan">---</div>
+    </div>
+
+    <!-- ご利用中オプション -->
+    <div style="margin-top:14px;">
+      <div class="sub">ご利用中オプション</div>
+      <div class="value" id="db_options">---</div>
+    </div>
+
+    <!-- Nメールアドレス -->
+    <div style="margin-top:14px;">
+      <div class="sub">Nメールアドレス</div>
+      <div class="value" id="db_nmail">＊＊＊</div>
     </div>
 
     <!-- 契約書 -->
@@ -172,7 +196,7 @@ body {
   <div class="card">
     <div class="card-title">ユーザーID</div>
     <div class="user-id">
-      <div class="value" id="userId">user-12345678</div>
+      <div class="value" id="userId">---</div>
       <div class="copy-btn" onclick="copyUserId()">コピー</div>
     </div>
     <div class="sub">※ ログインやお問い合わせで使用します</div>
@@ -190,6 +214,7 @@ function copyUserId() {
 <!-- ★追加：DB読み込み -->
 <script src="./api.js"></script>
 <script src="./auth.js"></script>
+
 <script>
 (async () => {
   const login = requireLoginOrRedirect();
@@ -197,12 +222,13 @@ function copyUserId() {
 
   try {
     const res = await apiMe(login.contractId, login.userId);
-    if (!res.ok) {
+
+    if (!res || !res.ok) {
       logout();
       return;
     }
 
-    const u = res.user;
+    const u = res.user || {};
 
     // 上段の氏名
     setText("db_sei_top", u.sei);
@@ -215,6 +241,12 @@ function copyUserId() {
     setText("db_mei", u.mei);
     setText("db_seiKana", u.seiKana);
     setText("db_meiKana", u.meiKana);
+
+    // 住所・契約プラン・オプション・Nメール
+    setText("db_address", u.address || "---");
+    setText("db_plan", u.plan || "---");
+    setText("db_options", u.options || "---");
+    setText("db_nmail", u.nmail || "＊＊＊");
 
     // ユーザーID（表示）
     setText("userId", u.userId);
@@ -233,7 +265,10 @@ function copyUserId() {
       }
     }
 
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+    alert("ユーザー情報の取得に失敗しました");
+  }
 })();
 
 function setText(id, value) {
