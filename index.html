@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NNMInternet マイページ</title>
-  <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#bf0000">
 
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#bf0000">
 
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1:wght@600&display=swap" rel="stylesheet">
 
@@ -194,7 +194,7 @@ svg { transform: rotate(-90deg); }
   <!-- 利用料金 -->
   <div class="card">
     <div class="card-title">今月のご利用料金</div>
-    <div class="price" id="db_fee">¥０</div>
+    <div class="price" id="db_fee">---</div>
     <div class="sub">5GHz帯 無制限</div>
   </div>
 
@@ -277,12 +277,6 @@ function toggleNotice() {
   d.style.display = d.style.display === 'block' ? 'none' : 'block';
 }
 
-function changeMonth() {
-  const s = document.getElementById('monthSelect');
-  document.getElementById('usageLabel').textContent =
-    `高速データ通信（${s.value}）`;
-}
-
 function openMenu() {
   document.querySelector('.drawer').classList.add('open');
   document.querySelector('.overlay').classList.add('show');
@@ -297,6 +291,7 @@ function closeMenu() {
 <!-- ★追加：DB読み込み -->
 <script src="./api.js"></script>
 <script src="./auth.js"></script>
+
 <script>
 (async () => {
   const login = requireLoginOrRedirect();
@@ -304,17 +299,36 @@ function closeMenu() {
 
   try {
     const res = await apiMe(login.contractId, login.userId);
-    if (!res.ok) {
+
+    if (!res || !res.ok) {
       logout();
       return;
     }
 
-    const u = res.user;
+    const u = res.user || {};
 
+    // 今月のご利用料金
     const feeEl = document.getElementById("db_fee");
-    if (feeEl) feeEl.textContent = `¥${u.fee}`;
+    if (feeEl) {
+      const fee = (u.fee ?? "").toString().trim();
 
-  } catch (e) {}
+      // feeが空なら「---」表示
+      if (!fee) {
+        feeEl.textContent = "---";
+      } else {
+        // 数字でも文字列でもOK（例：0 / 0円 / 1234）
+        // すでに¥が入ってたらそのまま
+        if (fee.includes("¥")) {
+          feeEl.textContent = fee;
+        } else {
+          feeEl.textContent = `¥${fee}`;
+        }
+      }
+    }
+
+  } catch (e) {
+    console.error(e);
+  }
 })();
 </script>
 
