@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nメール</title>
+
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1:wght@600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'M PLUS 1', sans-serif;
+  background: #f2f2f2;
+}
+
+/* ===== ヘッダー ===== */
+.header {
+  background: #bf0000;
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+}
+
+.back {
+  margin-right: 12px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ===== 共通 ===== */
+.container {
+  padding: 16px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.card-title {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.value {
+  font-size: 16px;
+}
+
+.sub {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* ===== ボタン（aタグ対応） ===== */
+.action-link,
+.link-outline {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.action-link {
+  background: #bf0000;
+  color: #fff;
+}
+
+.link-outline {
+  border: 1px solid #bf0000;
+  color: #bf0000;
+  background: #fff;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ヘッダー -->
+<div class="header">
+  <div class="back" onclick="history.back()">←</div>
+  <div>Nメール</div>
+</div>
+
+<div class="container">
+
+  <!-- 利用中アドレス -->
+  <div class="card">
+    <div class="card-title">ご利用中のメールアドレス</div>
+    <div class="value" id="db_nmail">user@nmail.example</div>
+  </div>
+
+  <!-- メールログイン -->
+  <div class="card">
+    <div class="card-title">メールログイン</div>
+    <div class="sub">
+      Webメールにログインしてメールを確認できます
+    </div>
+
+    <!-- 実リンク（指定済み） -->
+    <a
+      class="action-link"
+      href="https://s323.xrea.com/mailr/?_gl=1*1597l0u*_gcl_au*MTgxNDcyMDU4Ni4xNzYwMTMxMzM2LjE0MDQwNzYyNjQuMTc2MDMwNjQwMi4xNzYwMzA3MDYz*_ga*NjQ4NDg3NTU3LjE3NjAxMzEzMzY.*_ga_J8YE7Q8ZQD*czE3NjAzMDU0MjEkbzgkZzEkdDE3NjAzMDcxMjYkajEkbDAkaDI4NzQ0ODUwMg.."
+      target="_blank"
+      rel="noopener"
+    >
+      メールにログイン
+    </a>
+  </div>
+
+  <!-- アプリ / 設定 -->
+  <div class="card">
+    <div class="card-title">メールアプリ・設定方法・申し込み</div>
+
+    <a
+      class="action-link"
+      href="https://questant.jp/q/XY6DI9JD"
+      target="_blank"
+      rel="noopener"
+    >
+      メールのお申し込み
+    </a>
+    
+    <a
+      class="link-outline"
+      href="#"
+    >
+      メールアプリのダウンロード
+    </a>
+
+    <a
+      class="link-outline"
+      href="#"
+    >
+      設定方法を見る
+    </a>
+  </div>
+
+  <!-- Googleアカウント -->
+  <div class="card">
+    <div class="card-title">Nメール Googleアカウント</div>
+    <div class="sub">
+      NメールをGoogleアカウントとして利用できます
+    </div>
+
+    <a
+      class="action-link"
+      href="#"
+    >
+      Googleアカウント発行申請
+    </a>
+  </div>
+
+</div>
+
+<!-- ★追加：DB読み込み -->
+<script src="./api.js"></script>
+<script src="./auth.js"></script>
+<script>
+(async () => {
+  const login = requireLoginOrRedirect();
+  if (!login) return;
+
+  try {
+    const res = await apiMe(login.contractId, login.userId);
+    if (!res.ok) {
+      logout();
+      return;
+    }
+
+    const u = res.user;
+
+    // Nメール（未利用なら＊＊＊）
+    const el = document.getElementById("db_nmail");
+    if (el) el.textContent = u.nmail || "＊＊＊";
+
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>
