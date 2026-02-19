@@ -1,6 +1,6 @@
 const CACHE_NAME = 'nmobile-pwa-v1';
 const URLS_TO_CACHE = [
-  './',
+  './login.html',
   './index.html',
   './mypage.html',
   './nmail.html'
